@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model swsCompany {
+  id                   String                 @id @default(cuid())
+  name                 String
+  ticker_symbol        String?
+  exchange_symbol      String?
+  unique_symbol        String?
+  date_generated       String
+  security_name        String?
+  exchange_country_iso String?
+  listing_currency_iso String?
+  canonical_url        String?
+  unique_symbol_slug   String?
+  score_id             Int
+  swsCompanyScore      swsCompanyScore        @relation("swsCompany_score_idToswsCompanyScore", fields: [score_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  swsCompanyPriceClose swsCompanyPriceClose[]
+}
+
+model swsCompanyPriceClose {
+  date         String
+  company_id   String
+  price        Float
+  date_created String
+  swsCompany   swsCompany @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([date, company_id])
+}
+
+model swsCompanyScore {
+  id                                              Int          @id @default(autoincrement())
+  company_id                                      String
+  date_generated                                  String
+  dividend                                        Int
+  future                                          Int
+  health                                          Int
+  management                                      Int
+  past                                            Int
+  value                                           Int
+  misc                                            Int
+  total                                           Int
+  sentence                                        String?
+  swsCompany_swsCompany_score_idToswsCompanyScore swsCompany[] @relation("swsCompany_score_idToswsCompanyScore")
+}
