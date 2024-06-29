@@ -78,10 +78,10 @@ export default function StocksTable() {
   });
 
   const filteredStocks = React.useMemo(() => {
-    let filteredStocks = stocksList.items;
+    let filteredStocks = stocksList.items as Stock[];
 
     if (exchangeFilter !== "all" && Array.from(exchangeFilter).length !== 3) {
-      filteredStocks = filteredStocks.filter((stock) =>
+      filteredStocks = filteredStocks.filter((stock: Stock) =>
         Array.from(exchangeFilter).includes(stock.exchangeSymbol),
       );
     }
@@ -110,7 +110,7 @@ export default function StocksTable() {
                 closeOnSelect={false}
                 selectedKeys={exchangeFilter}
                 selectionMode="multiple"
-                onSelectionChange={setExchangeFilter}
+                onSelectionChange={setExchangeFilter as any}
               >
                 {exchangeOptions?.map((exchangeOption) => (
                   <DropdownItem key={exchangeOption} className="capitalize">
