@@ -1,3 +1,5 @@
+import { swsCompanyPriceClose } from "@prisma/client";
+
 import { prisma } from "@/config/prisma";
 import StockVolatilityService from "@/src/backend/src/service/StockVolatilityCalculatorService";
 
@@ -16,7 +18,7 @@ class StockRetrievalService {
           take: StockRetrievalService.MAX_NUMBER_OF_SHARE_PRICES,
           orderBy: {
             // This is actually sorting strings not dates. Prisma does not support sqlite date type
-            date_created: "desc",
+            date_created: "asc",
           },
         },
         swsCompanyScore: true,
@@ -27,12 +29,14 @@ class StockRetrievalService {
     });
 
     return companiesWithLastPrice.map((company) => {
+      const sharePricesSortedByDateAscending = company.swsCompanyPriceClose;
+
       return {
         companyName: company.name,
         symbol: company.ticker_symbol,
         exchangeSymbol: company.exchange_symbol,
         uniqueSymbol: company.unique_symbol,
-        latestPrice: company.swsCompanyPriceClose[0].price,
+        latestPrice: this.getLatestSharePrice(sharePricesSortedByDateAscending),
         sharePrices: company.swsCompanyPriceClose
           ?.slice(0, defaultNumberOfPreviousSharePrices)
           .map((price) => ({
@@ -51,6 +55,10 @@ class StockRetrievalService {
         },
       };
     });
+  }
+
+  private getLatestSharePrice(sharePricesSortedByDateAscending: swsCompanyPriceClose[]) {
+    return sharePricesSortedByDateAscending[sharePricesSortedByDateAscending.length - 1].price;
   }
 }
 

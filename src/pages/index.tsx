@@ -24,7 +24,7 @@ export default function IndexPage() {
               radius: "full",
               variant: "shadow",
             })}
-            // href={siteConfig.links.docs}
+            href={siteConfig.links.documentation}
           >
             Documentation
           </Link>

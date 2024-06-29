@@ -43,7 +43,7 @@ export default function StocksTable() {
           uniqueSymbol: stock.uniqueSymbol,
           overallScore: stock.snowflake.overallScore,
           description: stock.snowflake.description,
-          latestPrice: stock.sharePrices[0].price,
+          latestPrice: stock.latestPrice,
           volatility: {
             ...stock.stockVolatility,
             sortKey: stock.stockVolatility.annualVolatility,
@@ -123,6 +123,7 @@ export default function StocksTable() {
 
   return (
     <Table
+      aria-label="Stocks table"
       classNames={{
         table: "min-h-[400px]",
       }}
