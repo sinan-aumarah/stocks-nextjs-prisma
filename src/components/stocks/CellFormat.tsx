@@ -18,12 +18,12 @@ function cellRenderer(columnKey: string, cellValue: any) {
       return (
         <div className="flex flex-col">
           <p className="text-bold text-small capitalize">
-            Annual: {`${volatilityFormatter(cellValue.annualVolatility)}`}
+            Annual: {volatilityFormatter(cellValue.annualVolatility)}
           </p>
           <p className="text-bold text-tiny capitalize text-default-400">
-            Daily: ${volatilityFormatter(cellValue.dailyVolatility)}
+            Daily: {volatilityFormatter(cellValue.dailyVolatility)}
           </p>
-          {!cellValue.isEnoughDataAvailable ? (
+          {!cellValue.isSufficientDataPresent ? (
             <p className="text-bold text-tiny capitalize text-default-400">
               Based on {cellValue.totalDaysCompared}days
             </p>

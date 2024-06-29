@@ -14,7 +14,8 @@ import StockRetrievalService from "@/src/backend/src/service/StockRetrievalServi
 // },
 //
 
-// const companiesWithLastPrice: CompanyPrice[] = await prisma.$queryRaw<$swsCompanyPayload & $swsCompanyPriceClosePayload>`
+// const companiesWithLastPrice: CompanyPrice[] = await prisma.$queryRaw<$swsCompanyPayload &
+// $swsCompanyPriceClosePayload>`
 //     SELECT *
 //     FROM swsCompany
 //              INNER JOIN swsCompanyPriceClose
@@ -34,24 +35,16 @@ import StockRetrievalService from "@/src/backend/src/service/StockRetrievalServi
 const stockRetrievalService = new StockRetrievalService();
 
 // GET /api/stocks
-export default async function handle(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const maxNumberOfPreviousSharePrices = 100;
   var numberOfPreviousSharePrices = 1;
   const { price_limit } = req.query;
 
   if (price_limit) {
-    numberOfPreviousSharePrices = Math.min(
-      parseInt(price_limit as string),
-      maxNumberOfPreviousSharePrices,
-    );
+    numberOfPreviousSharePrices = Math.min(parseInt(price_limit as string), maxNumberOfPreviousSharePrices);
   }
 
-  const result = await stockRetrievalService.getLatestStocks(
-    numberOfPreviousSharePrices,
-  );
+  const result = await stockRetrievalService.getLatestStocks(numberOfPreviousSharePrices);
 
   return res.json(result);
 }

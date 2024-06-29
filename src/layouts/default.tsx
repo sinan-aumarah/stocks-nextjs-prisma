@@ -4,11 +4,7 @@ import React from "react";
 
 import { siteConfig } from "@/config/site";
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex flex-col h-screen">
       <NextHead>
@@ -18,13 +14,12 @@ export default function DefaultLayout({
         <meta content={siteConfig.description} name="description" />
         <meta
           key="viewport"
-          content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          content="viewport-fit=cover, width=device-width,
+                   initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
           name="viewport"
         />
       </NextHead>
-      <main className="container mx-auto max-w-7xl px-6 flex-grow">
-        {children}
-      </main>
+      <main className="container mx-auto max-w-7xl px-6 flex-grow">{children}</main>
       <footer className="w-full flex items-center justify-center py-3">
         <Link
           isExternal

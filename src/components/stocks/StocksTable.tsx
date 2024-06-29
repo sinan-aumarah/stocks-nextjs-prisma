@@ -57,17 +57,12 @@ export default function StocksTable() {
           let first = a[sortDescriptor.column];
           let second = b[sortDescriptor.column];
 
-          if (
-            typeof first === "object" &&
-            !Array.isArray(first) &&
-            first !== null
-          ) {
+          if (typeof first === "object" && !Array.isArray(first) && first !== null) {
             first = a[sortDescriptor.column].sortKey;
             second = b[sortDescriptor.column].sortKey;
           }
 
-          let comparator =
-            (parseInt(first) || first) < (parseInt(second) || second) ? -1 : 1;
+          let comparator = (parseInt(first) || first) < (parseInt(second) || second) ? -1 : 1;
 
           if (sortDescriptor.direction === "descending") {
             comparator *= -1;
@@ -91,9 +86,7 @@ export default function StocksTable() {
     return filteredStocks;
   }, [stocksList, exchangeFilter]);
 
-  const exchangeOptions = [
-    ...new Set(stocksList.items?.map((stock: any) => stock.exchangeSymbol)),
-  ];
+  const exchangeOptions = [...new Set(stocksList.items?.map((stock: any) => stock.exchangeSymbol))];
 
   const topContent = React.useMemo(() => {
     return (
@@ -102,10 +95,7 @@ export default function StocksTable() {
           <div className="flex gap-3">
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
+                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Filter by exchange
                 </Button>
               </DropdownTrigger>
@@ -125,9 +115,7 @@ export default function StocksTable() {
               </DropdownMenu>
             </Dropdown>
           </div>
-          <span className="text-default-400 text-small">
-            Total {filteredStocks.length} stocks
-          </span>
+          <span className="text-default-400 text-small">Total {filteredStocks.length} stocks</span>
         </div>
       </div>
     );
@@ -161,16 +149,10 @@ export default function StocksTable() {
           Volatility percentage
         </TableColumn>
       </TableHeader>
-      <TableBody
-        isLoading={isLoading}
-        items={filteredStocks}
-        loadingContent={<Spinner label="Loading..." />}
-      >
+      <TableBody isLoading={isLoading} items={filteredStocks} loadingContent={<Spinner label="Loading..." />}>
         {(stock) => (
           <TableRow key={stock.uniqueSymbol}>
-            {(columnKey) => (
-              <TableCell>{renderCell(stock, columnKey)}</TableCell>
-            )}
+            {(columnKey) => <TableCell>{renderCell(stock, columnKey)}</TableCell>}
           </TableRow>
         )}
       </TableBody>

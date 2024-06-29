@@ -15,7 +15,7 @@ class StockRetrievalService {
         swsCompanyPriceClose: {
           take: StockRetrievalService.MAX_NUMBER_OF_SHARE_PRICES,
           orderBy: {
-            // This is actually sorting strings not dates. Prisma does not yet support SQL date type
+            // This is actually sorting strings not dates. Prisma does not support sqlite date type
             date_created: "desc",
           },
         },
@@ -39,9 +39,7 @@ class StockRetrievalService {
             dateTime: new Date(price.date_created),
             price: price.price,
           })),
-        stockVolatility: this.stockVolatilityService.calculateVolatility(
-          company.swsCompanyPriceClose,
-        ),
+        stockVolatility: this.stockVolatilityService.calculateVolatility(company.swsCompanyPriceClose),
         snowflake: {
           overallScore: company.swsCompanyScore.total,
           description: company.swsCompanyScore.sentence,

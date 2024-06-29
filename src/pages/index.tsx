@@ -13,9 +13,7 @@ export default function IndexPage() {
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title({ color: "violet" })}>The revolution&nbsp;</h1>
           <br />
-          <h1 className={title({ color: "blue" })}>
-            for long term stock investors
-          </h1>
+          <h1 className={title({ color: "blue" })}>for long term stock investors</h1>
         </div>
 
         <div className="flex gap-3">
