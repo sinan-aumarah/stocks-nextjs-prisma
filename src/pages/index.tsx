@@ -19,6 +19,13 @@ export default function IndexPage() {
         <div className="flex gap-3">
           <Link
             isExternal
+            className={buttonStyles({ color: "success", variant: "solid", radius: "full" })}
+            href={siteConfig.links.swagger}
+          >
+            Live Swagger
+          </Link>
+          <Link
+            isExternal
             className={buttonStyles({
               color: "primary",
               radius: "full",

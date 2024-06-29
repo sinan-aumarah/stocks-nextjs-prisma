@@ -7,7 +7,6 @@ import { PaginatedStocksRequest } from "@/src/backend/src/types/types";
 class StockRetrievalService {
   // one year worth of share prices
   private readonly maxNumberOfPriceHistory = 252;
-  private readonly defaultOffset = 0;
   private readonly defaultCompaniesPerRequestLimit = 100;
 
   private stockVolatilityService: StockVolatilityService;
@@ -26,6 +25,9 @@ class StockRetrievalService {
       priceHistoryLimit || this.maxNumberOfPriceHistory,
       this.maxNumberOfPriceHistory,
     );
+
+    const actualLimit = limit || this.defaultCompaniesPerRequestLimit;
+    const actualOffset = offset || 0;
     const [companiesWithLastPrice, totalStockCount] = await prisma.$transaction([
       prisma.swsCompany.findMany({
         include: {
@@ -41,41 +43,45 @@ class StockRetrievalService {
         orderBy: {
           name: "asc",
         },
-        skip: offset || this.defaultOffset,
-        take: limit || this.defaultCompaniesPerRequestLimit,
+        skip: actualOffset,
+        take: actualLimit,
       }),
       prisma.swsCompany.count(),
     ]);
 
-    return companiesWithLastPrice.map((dbCompany) => {
-      const sharePricesSortedByLatestToOldest = dbCompany.swsCompanyPriceClose;
+    return {
+      limit: actualLimit,
+      offset: actualOffset,
+      totalStockCount: totalStockCount,
+      stocks: companiesWithLastPrice.map((dbCompany) => {
+        const sharePricesSortedByLatestToOldest = dbCompany.swsCompanyPriceClose;
 
-      return {
-        companyName: dbCompany.name,
-        symbol: dbCompany.ticker_symbol,
-        exchangeSymbol: dbCompany.exchange_symbol,
-        uniqueSymbol: dbCompany.unique_symbol,
-        latestPrice: sharePricesSortedByLatestToOldest[0].price,
-        sharePrices: dbCompany.swsCompanyPriceClose?.slice(0, maxPriceHistory).map((price) => ({
-          dateTime: new Date(price.date_created),
-          price: price.price,
-        })),
-        stockVolatility: this.getStockVolatility(
-          sharePricesSortedByLatestToOldest,
-          numberOfDaysForVolatilityCalculation,
-        ),
-        snowflake: {
-          overallScore: dbCompany.swsCompanyScore.total,
-          description: dbCompany.swsCompanyScore.sentence,
-          value: dbCompany.swsCompanyScore.value,
-          future: dbCompany.swsCompanyScore.future,
-          past: dbCompany.swsCompanyScore.past,
-          health: dbCompany.swsCompanyScore.health,
-          dividend: dbCompany.swsCompanyScore.dividend,
-        },
-        totalStockCount,
-      };
-    });
+        return {
+          companyName: dbCompany.name,
+          symbol: dbCompany.ticker_symbol,
+          exchangeSymbol: dbCompany.exchange_symbol,
+          uniqueSymbol: dbCompany.unique_symbol,
+          latestPrice: sharePricesSortedByLatestToOldest[0].price,
+          sharePrices: dbCompany.swsCompanyPriceClose?.slice(0, maxPriceHistory).map((price) => ({
+            dateTime: new Date(price.date_created),
+            price: price.price,
+          })),
+          stockVolatility: this.getStockVolatility(
+            sharePricesSortedByLatestToOldest,
+            numberOfDaysForVolatilityCalculation,
+          ),
+          snowflake: {
+            overallScore: dbCompany.swsCompanyScore.total,
+            description: dbCompany.swsCompanyScore.sentence,
+            value: dbCompany.swsCompanyScore.value,
+            future: dbCompany.swsCompanyScore.future,
+            past: dbCompany.swsCompanyScore.past,
+            health: dbCompany.swsCompanyScore.health,
+            dividend: dbCompany.swsCompanyScore.dividend,
+          },
+        };
+      }),
+    };
   }
 
   private getStockVolatility(

@@ -6,5 +6,6 @@ export const siteConfig = {
   links: {
     documentation: "https://github.com/sinan-aumarah/stocks-nextjs-prisma/blob/main/README.md",
     github: "https://github.com/sinan-aumarah/stocks-nextjs-prisma/tree/main",
+    swagger: "/swagger",
   },
 };

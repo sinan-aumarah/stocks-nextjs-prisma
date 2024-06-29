@@ -37,7 +37,7 @@ export default function StocksTable() {
       setIsLoading(false);
 
       return {
-        items: stocksJsonResponse.map((stock: any) => ({
+        items: stocksJsonResponse.stocks.map((stock: any) => ({
           companyName: stock.companyName,
           exchangeSymbol: stock.exchangeSymbol,
           uniqueSymbol: stock.uniqueSymbol,
