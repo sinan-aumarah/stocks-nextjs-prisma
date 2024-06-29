@@ -22,12 +22,15 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
       <main className="container mx-auto max-w-7xl px-6 flex-grow">{children}</main>
       <footer className="w-full flex items-center justify-center py-3">
         <Link
+          isBlock
           isExternal
+          showAnchorIcon
           className="flex items-center gap-1 text-current"
+          color="success"
           href="https://sinanaumarah.com"
           title="Sinan Aumarah 2024"
         >
-          <p className="text-primary">Sinan Aumarah 2024</p>
+          © 2024 Sinan Aumarah
         </Link>
       </footer>
     </div>

@@ -1,8 +1,12 @@
 import { swsCompanyPriceClose } from "@prisma/client";
 
 import { prisma } from "@/prisma/prisma";
-import StockVolatilityService from "@/src/backend/src/service/StockVolatilityCalculatorService";
-import { PaginatedStocksRequest } from "@/src/backend/src/types/types";
+import StockVolatilityService from "@/src/backend/service/StockVolatilityCalculatorService";
+import {
+  PaginatedStocksRequest,
+  PaginatedStocksResponse,
+  StockVolatilityScore,
+} from "@/src/backend/types/types";
 
 class StockRetrievalService {
   // one year worth of share prices
@@ -16,11 +20,11 @@ class StockRetrievalService {
   }
 
   async getStocksPaginated({
-    numberOfDaysForVolatilityCalculation,
+    volatilityPeriodInDays,
     priceHistoryLimit,
     limit,
     offset,
-  }: PaginatedStocksRequest) {
+  }: PaginatedStocksRequest): Promise<PaginatedStocksResponse> {
     const maxPriceHistory = Math.min(
       priceHistoryLimit || this.maxNumberOfPriceHistory,
       this.maxNumberOfPriceHistory,
@@ -66,10 +70,7 @@ class StockRetrievalService {
             dateTime: new Date(price.date_created),
             price: price.price,
           })),
-          stockVolatility: this.getStockVolatility(
-            sharePricesSortedByLatestToOldest,
-            numberOfDaysForVolatilityCalculation,
-          ),
+          stockVolatility: this.getStockVolatility(sharePricesSortedByLatestToOldest, volatilityPeriodInDays),
           snowflake: {
             overallScore: dbCompany.swsCompanyScore.total,
             description: dbCompany.swsCompanyScore.sentence,
@@ -86,11 +87,13 @@ class StockRetrievalService {
 
   private getStockVolatility(
     sharePricesSortedByDateDescending: swsCompanyPriceClose[],
-    calculateVolatilityBasedOnLastNumberOfDays: number,
-  ) {
+    volatilityPeriodInDays: number | null,
+  ): StockVolatilityScore {
+    const sharePricesSortedByDateAsc = sharePricesSortedByDateDescending.slice().reverse();
+
     return this.stockVolatilityService.calculateVolatility(
-      sharePricesSortedByDateDescending.slice().reverse(),
-      calculateVolatilityBasedOnLastNumberOfDays,
+      sharePricesSortedByDateAsc,
+      volatilityPeriodInDays || 0,
     );
   }
 }

@@ -1,11 +1,6 @@
 import { swsCompanyPriceClose } from "@prisma/client";
 
-type StockVolatilityScore = {
-  annualVolatility: number;
-  dailyVolatility: number;
-  isSufficientDataPresent: boolean;
-  totalDaysCompared: number;
-};
+import { StockVolatilityScore } from "@/src/backend/types/types";
 
 /**
  * Calculate the annual and daily volatility of a stock using the standard deviation sample method.

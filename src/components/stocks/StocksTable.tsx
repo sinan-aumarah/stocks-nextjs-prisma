@@ -16,12 +16,15 @@ import { Button } from "@nextui-org/button";
 import { ChevronDownIcon } from "@nextui-org/shared-icons";
 
 import { cellRenderer } from "@/src/components/stocks/CellFormat";
+import { StocksAPIResponse } from "@/src/pages/api/types";
+import { Stock } from "@/src/backend/types/types";
 
 export default function StocksTable() {
+  const STOCKS_API_URL = "/api/stocks?limit=25";
   const [isLoading, setIsLoading] = React.useState(true);
   const [exchangeFilter, setExchangeFilter] = React.useState<string>("all");
 
-  const renderCell = React.useCallback((stock: any, columnKey: React.Key) => {
+  const renderCell = React.useCallback((stock: any, columnKey: keyof Stock) => {
     const cellValue = stock[columnKey];
 
     return cellRenderer(columnKey, cellValue);
@@ -29,10 +32,10 @@ export default function StocksTable() {
 
   let stocksList = useAsyncList({
     async load({ signal }) {
-      let res = await fetch("/api/stocks?limit=100", {
+      let res = await fetch(STOCKS_API_URL, {
         signal,
       });
-      let stocksJsonResponse = await res.json();
+      let stocksJsonResponse: StocksAPIResponse = await res.json();
 
       setIsLoading(false);
 
@@ -54,12 +57,12 @@ export default function StocksTable() {
     async sort({ items, sortDescriptor }) {
       return {
         items: items.sort((a: any, b: any) => {
-          let first = a[sortDescriptor.column];
-          let second = b[sortDescriptor.column];
+          let first = a[sortDescriptor.column as keyof Stock];
+          let second = b[sortDescriptor.column as keyof Stock];
 
           if (typeof first === "object" && !Array.isArray(first) && first !== null) {
-            first = a[sortDescriptor.column].sortKey;
-            second = b[sortDescriptor.column].sortKey;
+            first = a[sortDescriptor.column as keyof Stock].sortKey;
+            second = b[sortDescriptor.column as keyof Stock].sortKey;
           }
 
           let comparator = (parseInt(first) || first) < (parseInt(second) || second) ? -1 : 1;
@@ -86,7 +89,9 @@ export default function StocksTable() {
     return filteredStocks;
   }, [stocksList, exchangeFilter]);
 
-  const exchangeOptions = [...new Set(stocksList.items?.map((stock: any) => stock.exchangeSymbol))];
+  const exchangeOptions = Array.from(
+    new Set((stocksList.items as Stock[])?.map((stock: Stock) => stock.exchangeSymbol)),
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -141,7 +146,7 @@ export default function StocksTable() {
           Symbol
         </TableColumn>
         <TableColumn key="overallScore" allowsSorting>
-          Snowflake overall value
+          Company score
         </TableColumn>
         <TableColumn key="latestPrice" allowsSorting>
           Latest price
@@ -150,10 +155,14 @@ export default function StocksTable() {
           Volatility percentage
         </TableColumn>
       </TableHeader>
-      <TableBody isLoading={isLoading} items={filteredStocks} loadingContent={<Spinner label="Loading..." />}>
+      <TableBody
+        isLoading={isLoading}
+        items={filteredStocks as Stock[]}
+        loadingContent={<Spinner label="Loading..." />}
+      >
         {(stock) => (
           <TableRow key={stock.uniqueSymbol}>
-            {(columnKey) => <TableCell>{renderCell(stock, columnKey)}</TableCell>}
+            {(columnKey) => <TableCell>{renderCell(stock, columnKey as keyof Stock)}</TableCell>}
           </TableRow>
         )}
       </TableBody>

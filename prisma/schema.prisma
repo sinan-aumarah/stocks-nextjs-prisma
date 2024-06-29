@@ -10,9 +10,9 @@ datasource db {
 model swsCompany {
   id                   String                 @id @default(cuid())
   name                 String
-  ticker_symbol        String?
-  exchange_symbol      String?
-  unique_symbol        String?
+  ticker_symbol        String
+  exchange_symbol      String
+  unique_symbol        String
   date_generated       String
   security_name        String?
   exchange_country_iso String?
