@@ -8,27 +8,29 @@ type StockVolatilityScore = {
 };
 
 /**
- * Calculate the annual and daily volatility of a stock using the standard deviation method.
+ * Calculate the annual and daily volatility of a stock using the standard deviation sample method.
  * Reference https://www.macroption.com/historical-volatility-excel/
  *
  * @param priceHistorySorted an array of sorted closed price history elements sorted by date in ascending
  * @param numberOfDaysToCompare the number of days to consider when calculating the volatility
- * to ensure daily returns are calculated correctly
+ * to ensure daily returns are calculated correctly. Defaults to 252 days (working days in a year) and will
+ * never calculate more than this number regardless of the input. // TODO: is this really necessary or useful?
  */
 class StockVolatilityService {
   private readonly WORKING_DAYS_PER_ANNUM = 252;
 
   public calculateVolatility(
-    priceHistory: swsCompanyPriceClose[],
-    numberOfDaysToCompare: number = 90,
+    priceHistorySortedByOldestToLatest: swsCompanyPriceClose[],
+    numberOfDaysToCompare: number = this.WORKING_DAYS_PER_ANNUM,
   ): StockVolatilityScore {
-    // TODO: This is a naive approach, we should be ensuring the days and are unique and in consecutive order
-    const isEnoughCorrectDataAvailable = priceHistory.length >= numberOfDaysToCompare;
+    // TODO: This is a naive approach, we should be ensuring the days are unique and in consecutive order
+    const isEnoughCorrectDataAvailable = priceHistorySortedByOldestToLatest.length >= numberOfDaysToCompare;
 
-    const totalDaysToCompareFrom = Math.min(priceHistory.length, numberOfDaysToCompare);
-    const lastNPrices: number[] = this.getLastNElements(priceHistory, totalDaysToCompareFrom).map(
-      ({ price }) => price,
-    );
+    const totalDaysToCompareFrom = Math.min(priceHistorySortedByOldestToLatest.length, numberOfDaysToCompare);
+    const lastNPrices: number[] = this.getLastNElements(
+      priceHistorySortedByOldestToLatest,
+      totalDaysToCompareFrom,
+    ).map(({ price }) => price);
     const volatilityScore = this.calculateVolatilityUsingStandardDeviation(lastNPrices);
 
     return {
@@ -59,15 +61,7 @@ class StockVolatilityService {
   }
 
   private calculateDailyReturns(prices: number[]): number[] {
-    const dailyReturns: number[] = [];
-
-    for (let i = 1; i < prices.length; i++) {
-      const dailyReturn = Math.log(prices[i] / prices[i - 1]);
-
-      dailyReturns.push(dailyReturn);
-    }
-
-    return dailyReturns;
+    return prices.slice(1).map((price, i) => Math.log(price / prices[i]));
   }
 
   private getLastNElements<T>(array: T[], n: number): T[] {

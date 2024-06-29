@@ -29,7 +29,7 @@ export default function StocksTable() {
 
   let stocksList = useAsyncList({
     async load({ signal }) {
-      let res = await fetch("/api/stocks?price_limit=10", {
+      let res = await fetch("/api/stocks?limit=100", {
         signal,
       });
       let stocksJsonResponse = await res.json();

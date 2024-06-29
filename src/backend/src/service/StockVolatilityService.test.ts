@@ -91,7 +91,7 @@ describe("StockVolatilityService", () => {
       expect(result.totalDaysCompared).toBe(25);
     });
 
-    it.only("should use numberOfDaysToCompare to get the last N of records", () => {
+    it("should use numberOfDaysToCompare to get the last N of records", () => {
       const priceHistory = Array(25).fill(mockPriceHistory());
 
       priceHistory.push(mockPriceHistory(50), mockPriceHistory(200), mockPriceHistory(200));

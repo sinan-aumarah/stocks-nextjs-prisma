@@ -2,63 +2,90 @@ import { swsCompanyPriceClose } from "@prisma/client";
 
 import { prisma } from "@/config/prisma";
 import StockVolatilityService from "@/src/backend/src/service/StockVolatilityCalculatorService";
+import { PaginatedStocksRequest } from "@/src/backend/src/types/types";
 
 class StockRetrievalService {
-  private static readonly MAX_NUMBER_OF_SHARE_PRICES = 90;
+  // one year worth of share prices
+  private readonly maxNumberOfPriceHistory = 252;
+  private readonly defaultOffset = 0;
+  private readonly defaultCompaniesPerRequestLimit = 100;
+
   private stockVolatilityService: StockVolatilityService;
 
   constructor() {
     this.stockVolatilityService = new StockVolatilityService();
   }
 
-  async getLatestStocks(defaultNumberOfPreviousSharePrices: number) {
-    const companiesWithLastPrice = await prisma.swsCompany.findMany({
-      include: {
-        swsCompanyPriceClose: {
-          take: StockRetrievalService.MAX_NUMBER_OF_SHARE_PRICES,
-          orderBy: {
-            // This is actually sorting strings not dates. Prisma does not support sqlite date type
-            date_created: "asc",
+  async getStocksPaginated({
+    numberOfDaysForVolatilityCalculation,
+    priceHistoryLimit,
+    limit,
+    offset,
+  }: PaginatedStocksRequest) {
+    const maxPriceHistory = Math.min(
+      priceHistoryLimit || this.maxNumberOfPriceHistory,
+      this.maxNumberOfPriceHistory,
+    );
+    const [companiesWithLastPrice, totalStockCount] = await prisma.$transaction([
+      prisma.swsCompany.findMany({
+        include: {
+          swsCompanyPriceClose: {
+            take: this.maxNumberOfPriceHistory,
+            orderBy: {
+              // This is actually sorting strings not dates. Prisma does not support sqlite date type
+              date_created: "desc",
+            },
           },
+          swsCompanyScore: true,
         },
-        swsCompanyScore: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+        orderBy: {
+          name: "asc",
+        },
+        skip: offset || this.defaultOffset,
+        take: limit || this.defaultCompaniesPerRequestLimit,
+      }),
+      prisma.swsCompany.count(),
+    ]);
 
-    return companiesWithLastPrice.map((company) => {
-      const sharePricesSortedByDateAscending = company.swsCompanyPriceClose;
+    return companiesWithLastPrice.map((dbCompany) => {
+      const sharePricesSortedByLatestToOldest = dbCompany.swsCompanyPriceClose;
 
       return {
-        companyName: company.name,
-        symbol: company.ticker_symbol,
-        exchangeSymbol: company.exchange_symbol,
-        uniqueSymbol: company.unique_symbol,
-        latestPrice: this.getLatestSharePrice(sharePricesSortedByDateAscending),
-        sharePrices: company.swsCompanyPriceClose
-          ?.slice(0, defaultNumberOfPreviousSharePrices)
-          .map((price) => ({
-            dateTime: new Date(price.date_created),
-            price: price.price,
-          })),
-        stockVolatility: this.stockVolatilityService.calculateVolatility(company.swsCompanyPriceClose),
+        companyName: dbCompany.name,
+        symbol: dbCompany.ticker_symbol,
+        exchangeSymbol: dbCompany.exchange_symbol,
+        uniqueSymbol: dbCompany.unique_symbol,
+        latestPrice: sharePricesSortedByLatestToOldest[0].price,
+        sharePrices: dbCompany.swsCompanyPriceClose?.slice(0, maxPriceHistory).map((price) => ({
+          dateTime: new Date(price.date_created),
+          price: price.price,
+        })),
+        stockVolatility: this.getStockVolatility(
+          sharePricesSortedByLatestToOldest,
+          numberOfDaysForVolatilityCalculation,
+        ),
         snowflake: {
-          overallScore: company.swsCompanyScore.total,
-          description: company.swsCompanyScore.sentence,
-          value: company.swsCompanyScore.value,
-          future: company.swsCompanyScore.future,
-          past: company.swsCompanyScore.past,
-          health: company.swsCompanyScore.health,
-          dividend: company.swsCompanyScore.dividend,
+          overallScore: dbCompany.swsCompanyScore.total,
+          description: dbCompany.swsCompanyScore.sentence,
+          value: dbCompany.swsCompanyScore.value,
+          future: dbCompany.swsCompanyScore.future,
+          past: dbCompany.swsCompanyScore.past,
+          health: dbCompany.swsCompanyScore.health,
+          dividend: dbCompany.swsCompanyScore.dividend,
         },
+        totalStockCount,
       };
     });
   }
 
-  private getLatestSharePrice(sharePricesSortedByDateAscending: swsCompanyPriceClose[]) {
-    return sharePricesSortedByDateAscending[sharePricesSortedByDateAscending.length - 1].price;
+  private getStockVolatility(
+    sharePricesSortedByDateDescending: swsCompanyPriceClose[],
+    calculateVolatilityBasedOnLastNumberOfDays: number,
+  ) {
+    return this.stockVolatilityService.calculateVolatility(
+      sharePricesSortedByDateDescending.slice().reverse(),
+      calculateVolatilityBasedOnLastNumberOfDays,
+    );
   }
 }
 

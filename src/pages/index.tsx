@@ -30,7 +30,7 @@ export default function IndexPage() {
           </Link>
           <Link
             isExternal
-            className={buttonStyles({ variant: "bordered", radius: "full" })}
+            className={buttonStyles({ variant: "ghost", radius: "full" })}
             href={siteConfig.links.github}
           >
             GitHub
