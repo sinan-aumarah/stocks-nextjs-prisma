@@ -91,6 +91,18 @@ describe("StockVolatilityService", () => {
       expect(result.totalDaysCompared).toBe(25);
     });
 
+    it.only("should use numberOfDaysToCompare to get the last N of records", () => {
+      const priceHistory = Array(25).fill(mockPriceHistory());
+
+      priceHistory.push(mockPriceHistory(50), mockPriceHistory(200), mockPriceHistory(200));
+
+      const result = service.calculateVolatility(priceHistory, 3);
+
+      expect(result.dailyVolatility).toBeCloseTo(0.98, 3);
+      expect(result.isSufficientDataPresent).toBe(true);
+      expect(result.totalDaysCompared).toBe(3);
+    });
+
     it.todo("assert all days are unique and in consecutive order");
     it.todo("assert calculation based on a large comprehensive data set");
     it.todo("assert input constraints such as length and data integrity is valid for the calculation");

@@ -7,6 +7,14 @@ type StockVolatilityScore = {
   totalDaysCompared: number;
 };
 
+/**
+ * Calculate the annual and daily volatility of a stock using the standard deviation method.
+ * Reference https://www.macroption.com/historical-volatility-excel/
+ *
+ * @param priceHistorySorted an array of sorted closed price history elements sorted by date in ascending
+ * @param numberOfDaysToCompare the number of days to consider when calculating the volatility
+ * to ensure daily returns are calculated correctly
+ */
 class StockVolatilityService {
   private readonly WORKING_DAYS_PER_ANNUM = 252;
 
@@ -17,23 +25,19 @@ class StockVolatilityService {
     // TODO: This is a naive approach, we should be ensuring the days and are unique and in consecutive order
     const isEnoughCorrectDataAvailable = priceHistory.length >= numberOfDaysToCompare;
 
-    const lastNPrices: number[] = priceHistory.slice(0, numberOfDaysToCompare).map(({ price }) => price);
+    const totalDaysToCompareFrom = Math.min(priceHistory.length, numberOfDaysToCompare);
+    const lastNPrices: number[] = this.getLastNElements(priceHistory, totalDaysToCompareFrom).map(
+      ({ price }) => price,
+    );
     const volatilityScore = this.calculateVolatilityUsingStandardDeviation(lastNPrices);
 
     return {
       isSufficientDataPresent: isEnoughCorrectDataAvailable,
-      totalDaysCompared: priceHistory.length,
+      totalDaysCompared: totalDaysToCompareFrom,
       ...volatilityScore,
     };
   }
 
-  /**
-   * Calculate the annual and daily volatility of a stock using the standard deviation method.
-   * Reference https://www.macroption.com/historical-volatility-excel/
-   *
-   * @param priceHistorySorted an array of sorted closed price history elements sorted by date in ascending
-   * order to ensure daily returns are calculated correctly
-   */
   private calculateVolatilityUsingStandardDeviation(priceHistorySorted: number[]) {
     const dailyReturns = this.calculateDailyReturns(priceHistorySorted);
     const dailyStdDev = this.standardDeviationSample(dailyReturns);
@@ -64,6 +68,10 @@ class StockVolatilityService {
     }
 
     return dailyReturns;
+  }
+
+  private getLastNElements<T>(array: T[], n: number): T[] {
+    return array.slice(Math.max(array.length - n, 0));
   }
 }
 
