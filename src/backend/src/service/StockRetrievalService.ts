@@ -1,6 +1,6 @@
 import { swsCompanyPriceClose } from "@prisma/client";
 
-import { prisma } from "@/config/prisma";
+import { prisma } from "@/prisma/prisma";
 import StockVolatilityService from "@/src/backend/src/service/StockVolatilityCalculatorService";
 import { PaginatedStocksRequest } from "@/src/backend/src/types/types";
 

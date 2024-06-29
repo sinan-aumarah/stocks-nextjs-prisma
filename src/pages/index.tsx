@@ -19,7 +19,7 @@ export default function IndexPage() {
         <div className="flex gap-3">
           <Link
             isExternal
-            className={buttonStyles({ color: "success", variant: "solid", radius: "full" })}
+            className={buttonStyles({ color: "success", variant: "shadow", radius: "full" })}
             href={siteConfig.links.swagger}
           >
             Live Swagger
@@ -29,7 +29,7 @@ export default function IndexPage() {
             className={buttonStyles({
               color: "primary",
               radius: "full",
-              variant: "shadow",
+              variant: "bordered",
             })}
             href={siteConfig.links.documentation}
           >
@@ -37,7 +37,7 @@ export default function IndexPage() {
           </Link>
           <Link
             isExternal
-            className={buttonStyles({ variant: "ghost", radius: "full" })}
+            className={buttonStyles({ variant: "bordered", radius: "full" })}
             href={siteConfig.links.github}
           >
             GitHub

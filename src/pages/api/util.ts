@@ -1,9 +1,7 @@
 const parseToNumberIfAvailable = (value: any): number | null => {
-  if (typeof value === "string" && !isNaN(Number(value)) && value !== "") {
-    return Number(value);
-  }
+  const num = Number(value);
 
-  return null;
+  return isNaN(num) ? null : num;
 };
 
 export { parseToNumberIfAvailable };
