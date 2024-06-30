@@ -1,13 +1,13 @@
 import StockRepository from "@/src/backend/dao/StockRepository";
 import { prismaMock } from "@/prisma/prisma.jest.mock";
-import { getMockCompany } from "@/src/backend/dao/mock-objects";
+import { getMockRepositoryCompany } from "@/src/backend/dao/mock-objects";
 
 describe("StockRepository", () => {
   const stockDao: StockRepository = new StockRepository();
 
   describe("doGet", () => {
     it("should include historical share prices limited to priceHistoryLimit and ordered desc", async () => {
-      const mockCompanies = [getMockCompany(), getMockCompany()];
+      const mockCompanies = [getMockRepositoryCompany(), getMockRepositoryCompany()];
       const mockCount = 100;
       const expectedPriceHistoryLimit = 10;
 
