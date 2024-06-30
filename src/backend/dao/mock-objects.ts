@@ -20,3 +20,8 @@ export const getMockCompany = () => ({
     dividend: 5,
   },
 });
+
+export const getMockStockRepositoryResponse = () => ({
+  companiesWithPriceHistory: [getMockCompany()],
+  totalStockCount: 1,
+});

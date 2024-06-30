@@ -11,14 +11,18 @@ import StockRepository from "@/src/backend/dao/StockRepository";
 class StockRetrievalService {
   // one year worth of share prices
   private readonly maxNumberOfPriceHistory = 252;
+  private readonly maxCompaniesLimit = 1000;
   private readonly defaultCompaniesPerRequestLimit = 100;
 
   private stockVolatilityService: StockVolatilityService;
   private stockDao: StockRepository;
 
-  constructor() {
-    this.stockVolatilityService = new StockVolatilityService();
-    this.stockDao = new StockRepository();
+  constructor(
+    stockRepository: StockRepository = new StockRepository(),
+    stockVolatilityService: StockVolatilityService = new StockVolatilityService(),
+  ) {
+    this.stockVolatilityService = stockVolatilityService;
+    this.stockDao = stockRepository;
   }
 
   async getStocksPaginated({
@@ -31,9 +35,9 @@ class StockRetrievalService {
       priceHistoryLimit || this.maxNumberOfPriceHistory,
       this.maxNumberOfPriceHistory,
     );
-    const actualLimit = limit || this.defaultCompaniesPerRequestLimit;
+    const actualLimit = Math.min(limit || this.defaultCompaniesPerRequestLimit, this.maxCompaniesLimit);
     const actualOffset = offset || 0;
-    const { companiesWithLastPrice, totalStockCount } = await this.stockDao.doGet(
+    const { companiesWithPriceHistory, totalStockCount } = await this.stockDao.doGet(
       actualLimit,
       actualOffset,
       this.maxNumberOfPriceHistory,
@@ -43,7 +47,7 @@ class StockRetrievalService {
       limit: actualLimit,
       offset: actualOffset,
       totalStockCount: totalStockCount,
-      stocks: companiesWithLastPrice.map((dbCompany) => {
+      stocks: companiesWithPriceHistory.map((dbCompany) => {
         const sharePricesSortedByLatestToOldest = dbCompany.swsCompanyPriceClose;
 
         return {
@@ -77,7 +81,7 @@ class StockRetrievalService {
 
   private getStockVolatility(
     sharePricesSortedByDateDescending: swsCompanyPriceClose[],
-    volatilityPeriodInDays: number | null,
+    volatilityPeriodInDays?: number,
   ): StockVolatilityScore {
     const sharePricesSortedByDateAsc = sharePricesSortedByDateDescending.slice().reverse();
 

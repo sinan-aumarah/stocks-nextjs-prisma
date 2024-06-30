@@ -12,7 +12,7 @@ describe("StockRepository", () => {
       const expectedPriceHistoryLimit = 10;
 
       prismaMock.$transaction.mockResolvedValue([mockCompanies, mockCount]);
-      const { companiesWithLastPrice, totalStockCount } = await stockDao.doGet(
+      const { companiesWithPriceHistory, totalStockCount } = await stockDao.doGet(
         10,
         0,
         expectedPriceHistoryLimit,
@@ -31,7 +31,7 @@ describe("StockRepository", () => {
           },
         }),
       );
-      expect(companiesWithLastPrice).toEqual(mockCompanies);
+      expect(companiesWithPriceHistory).toEqual(mockCompanies);
       expect(totalStockCount).toEqual(mockCount);
     });
 

@@ -3,7 +3,7 @@ import { prisma } from "@/prisma/prisma";
 
 class StockRepository {
   async doGet(limit: number, offset: number, priceHistoryLimit: number) {
-    const [companiesWithLastPrice, totalStockCount] = await prisma.$transaction([
+    const [companiesWithPriceHistory, totalStockCount] = await prisma.$transaction([
       prisma.swsCompany.findMany({
         include: {
           swsCompanyPriceClose: {
@@ -25,7 +25,7 @@ class StockRepository {
     ]);
 
     return {
-      companiesWithLastPrice,
+      companiesWithPriceHistory,
       totalStockCount,
     };
   }

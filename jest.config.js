@@ -11,6 +11,9 @@ const config = {
   coverageProvider: "v8",
   testEnvironment: "jsdom",
   verbose: true,
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1",
+  },
   // Add more setup options before each test is run
   setupFilesAfterEnv: ["<rootDir>/prisma/prisma.jest.mock.ts"],
 };
