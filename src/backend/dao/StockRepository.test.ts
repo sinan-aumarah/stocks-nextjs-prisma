@@ -51,6 +51,26 @@ describe("StockRepository", () => {
       );
     });
 
+    it("should include company score", async () => {
+      prismaMock.$transaction.mockResolvedValue([[], 10]);
+
+      await stockDao.doGet(1, 1, 10);
+
+      expect(prismaMock.swsCompany.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: {
+            swsCompanyPriceClose: {
+              orderBy: {
+                date_created: "desc",
+              },
+              take: 10,
+            },
+            swsCompanyScore: true,
+          },
+        }),
+      );
+    });
+
     it("should order companies by name ascending", async () => {
       prismaMock.$transaction.mockResolvedValue([[], 10]);
 

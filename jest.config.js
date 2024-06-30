@@ -10,6 +10,7 @@ const createJestConfig = nextJest({
 const config = {
   coverageProvider: "v8",
   testEnvironment: "jsdom",
+  verbose: true,
   // Add more setup options before each test is run
   setupFilesAfterEnv: ["<rootDir>/prisma/prisma.jest.mock.ts"],
 };
