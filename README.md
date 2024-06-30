@@ -2,7 +2,7 @@
 ![CI build status](https://github.com/sinan-aumarah/stocks-nextjs-prisma/actions/workflows/node.js.yml/badge.svg)
 
 ### 🚧 Getting started
-**Prerequisite:** Node v20+
+**Prerequisite:** Node v18.0+
 
 ```sh
 yarn install      # Install dependencies

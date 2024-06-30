@@ -10,6 +10,9 @@
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
     "update-prisma-client": "prisma generate"
   },
+  "engines" : {
+    "node" : ">=18.0.0"
+  },
   "dependencies": {
     "@nextui-org/button": "2.0.34",
     "@nextui-org/link": "2.0.32",
