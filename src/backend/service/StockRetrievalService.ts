@@ -1,12 +1,12 @@
 import { swsCompanyPriceClose } from "@prisma/client";
 
-import { prisma } from "@/prisma/prisma";
 import StockVolatilityService from "@/src/backend/service/StockVolatilityCalculatorService";
 import {
   PaginatedStocksRequest,
   PaginatedStocksResponse,
   StockVolatilityScore,
 } from "@/src/backend/types/types";
+import StockRepository from "@/src/backend/dao/StockRepository";
 
 class StockRetrievalService {
   // one year worth of share prices
@@ -14,9 +14,11 @@ class StockRetrievalService {
   private readonly defaultCompaniesPerRequestLimit = 100;
 
   private stockVolatilityService: StockVolatilityService;
+  private stockDao: StockRepository;
 
   constructor() {
     this.stockVolatilityService = new StockVolatilityService();
+    this.stockDao = new StockRepository();
   }
 
   async getStocksPaginated({
@@ -29,29 +31,13 @@ class StockRetrievalService {
       priceHistoryLimit || this.maxNumberOfPriceHistory,
       this.maxNumberOfPriceHistory,
     );
-
     const actualLimit = limit || this.defaultCompaniesPerRequestLimit;
     const actualOffset = offset || 0;
-    const [companiesWithLastPrice, totalStockCount] = await prisma.$transaction([
-      prisma.swsCompany.findMany({
-        include: {
-          swsCompanyPriceClose: {
-            take: this.maxNumberOfPriceHistory,
-            orderBy: {
-              // This is actually sorting strings not dates. Prisma does not support sqlite date type
-              date_created: "desc",
-            },
-          },
-          swsCompanyScore: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        skip: actualOffset,
-        take: actualLimit,
-      }),
-      prisma.swsCompany.count(),
-    ]);
+    const { companiesWithLastPrice, totalStockCount } = await this.stockDao.doGet(
+      actualLimit,
+      actualOffset,
+      this.maxNumberOfPriceHistory,
+    );
 
     return {
       limit: actualLimit,
@@ -66,10 +52,7 @@ class StockRetrievalService {
           exchangeSymbol: dbCompany.exchange_symbol,
           uniqueSymbol: dbCompany.unique_symbol,
           latestPrice: sharePricesSortedByLatestToOldest[0].price,
-          sharePrices: dbCompany.swsCompanyPriceClose?.slice(0, maxPriceHistory).map((price) => ({
-            dateTime: new Date(price.date_created),
-            price: price.price,
-          })),
+          sharePrices: this.getSharePrices(sharePricesSortedByLatestToOldest, maxPriceHistory),
           stockVolatility: this.getStockVolatility(sharePricesSortedByLatestToOldest, volatilityPeriodInDays),
           snowflake: {
             overallScore: dbCompany.swsCompanyScore.total,
@@ -83,6 +66,13 @@ class StockRetrievalService {
         };
       }),
     };
+  }
+
+  private getSharePrices(sharePricesSortedByLatestToOldest: swsCompanyPriceClose[], maxPriceHistory: number) {
+    return sharePricesSortedByLatestToOldest.slice(0, maxPriceHistory).map((price) => ({
+      dateTime: new Date(price.date_created),
+      price: price.price,
+    }));
   }
 
   private getStockVolatility(

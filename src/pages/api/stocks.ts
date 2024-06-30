@@ -12,7 +12,8 @@ const stockRetrievalService = new StockRetrievalService();
  * /api/stocks:
  *   get:
  *     summary: Retrieve a list of stocks
- *     description: Retrieve a list of stocks. The API is paginated and the default limit is 100 stocks. Stocks returned are sorted by name in ascending order.
+ *     description: Retrieve a list of stocks. The API is paginated and the default limit is 100 stocks.
+ *                  Stocks returned are sorted by name in ascending order.
  *     parameters:
  *       - in: query
  *         name: limit
