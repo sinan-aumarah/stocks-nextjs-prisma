@@ -1,7 +1,7 @@
 import { swsCompanyPriceClose } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "@jest/globals";
 
-import StockVolatilityService from "@/src/backend/service/StockVolatilityCalculatorService";
+import StockVolatilityService from "@/src/backend/service/StockVolatilityService";
 
 describe("StockVolatilityService", () => {
   let service: StockVolatilityService;
