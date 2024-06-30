@@ -1,51 +1,63 @@
 # Stocks demo app using NextJs, NextUI & Prisma
+![CI build status](https://github.com/sinan-aumarah/stocks-nextjs-prisma/actions/workflows/node.js.yml/badge.svg)
 
-> Note: Since Next.js 14, the pages router is recommend migrating to the [new App Router](https://nextjs.org/docs/app) to leverage React's latest features
->
-> Read more: [Pages Router](https://nextjs.org/docs/pages)
+### 🚧 Getting started
+**Prerequisite:** Node v20+
 
-## Technologies Used
+```sh
+yarn install      # Install dependencies
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [NextUI](https://nextui.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+yarn test         # Run tests
 
-## How to Use
-
-To create a new project based on this template using `create-next-app`, run the following command:
-
-```bash
-npx create-next-app -e https://github.com/nextui-org/next-pages-template
+yarn dev          # Start the development server
 ```
 
-### Install dependencies
-
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
-
-```bash
-npm install
+### 🔭 Navigating the codebase
+```
+├── src/
+│   ├─ backend       <--- This where all the backened code lives apart from API
+│   └─ pages
+│      └── api       <––– REST APIs
+├── prisma/          <--- DB schema and configurations
+├── .env             <--- Change DATABASE_URL to your local DB
+└── ...
 ```
 
-### Run the development server
+## 🚩 Design choices & assumptions
+### Why NextJs?
+- The main reason for choosing NextJs is my nostalgia feeling for isomorphic projects and I just wanted to quickly spin up a backend and frontend together. 
+It is by no means the best choice for a high throughput, stand-alone production ready API, as it cannot easily horizontally scale. 
 
-```bash
-npm run dev
-```
+### API design
+- You can access the API documentation after you run the app by going to [/swagger](http://localhost:3000/swagger). Link is also available on the home page.
+- I have used a REST API design for now as it's quick to implement. I would have preferred to use GraphQL for this project.
 
-### Setup pnpm (optional)
+### Why choose an ORM such as Prisma?
+- Type safety, less boilerplate, caching strategy, readability, version control, testable and more maintainable than traditional sql clients.
+- I did not implement any DB query streams, caching or anything fancy as I have no idea what the non-functional requirements are. I just went with readability and maintainability 
+than catering for performance.
 
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
+### Data integrity and consistency
+- Volatility check and the choice of sample standard deviation. I used sample instead of population standard deviation as that's what most tutorials use.
+ I did not go into details on why or when we should use one or the other. I need more input from the specialists on this! 
+- I was not sure whether the dataset is generated via a tested and trustworthy source or not. I assumed that we might have to do sanity 
+checks, but I did not know to what extent I should go. Invalid or missing DB data will most likely just fail and throw an error. I just went with the happy path for now based on the 
+provided dataset. I would have loved to add a lot more tests and sanity checks.
 
-```bash
-public-hoist-pattern[]=*@nextui-org/*
-```
 
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+### Performance? db pagination, constraints
 
-## License
+### Frontend
+- I have not spent much time on the frontend as I wanted to focus on the backend. There are no tests and the code is a mess, I wrote it quickly
+just to demo the API then I decided to use Swagger UI instead.
 
-Licensed under the [MIT license](https://github.com/nextui-org/next-pages-template/blob/main/LICENSE).
+## 📚 References & Technologies Used
+
+- 🔗[Next.js 14](https://nextjs.org/docs/getting-started)
+- 🔗[NextUI](https://nextui.org)
+- 🔗[Tailwind CSS](https://tailwindcss.com)
+- 🔗[Tailwind Variants](https://tailwind-variants.org)
+- 🔗[TypeScript](https://www.typescriptlang.org)
+- 🔗[Framer Motion](https://www.framer.com/motion)
+- 🔗[next-themes](https://github.com/pacocoursey/next-themes)
+- 🔗[next-swagger-doc](https://github.com/jellydn/next-swagger-doc)
