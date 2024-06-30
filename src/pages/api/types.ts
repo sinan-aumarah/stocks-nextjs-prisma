@@ -12,7 +12,7 @@ type StockVolatility = {
 
 type Snowflake = {
   overallScore: number;
-  description?: string;
+  description: string | null;
 };
 
 type StockResponse = {

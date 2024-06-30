@@ -81,7 +81,7 @@ class StockRetrievalService {
 
   private getStockVolatility(
     sharePricesSortedByDateDescending: swsCompanyPriceClose[],
-    volatilityPeriodInDays?: number,
+    volatilityPeriodInDays?: number | null,
   ): StockVolatilityScore {
     const sharePricesSortedByDateAsc = sharePricesSortedByDateDescending.slice().reverse();
 

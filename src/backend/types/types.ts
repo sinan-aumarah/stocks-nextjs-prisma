@@ -1,8 +1,8 @@
 type PaginatedStocksRequest = {
-  volatilityPeriodInDays?: number;
-  priceHistoryLimit?: number;
-  offset?: number;
-  limit?: number;
+  volatilityPeriodInDays?: number | null;
+  priceHistoryLimit?: number | null;
+  offset?: number | null;
+  limit?: number | null;
 };
 
 type SharePrice = {
@@ -12,7 +12,7 @@ type SharePrice = {
 
 type Snowflake = {
   overallScore: number;
-  description?: string | null;
+  description: string | null;
   value: number;
   future: number;
   past: number;
