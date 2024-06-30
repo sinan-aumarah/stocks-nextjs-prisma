@@ -1,4 +1,4 @@
-# Stocks demo app using NextJs, NextUI & Prisma
+# Stocks demo app using Next.js, NextUI & Prisma
 ![CI build status](https://github.com/sinan-aumarah/stocks-nextjs-prisma/actions/workflows/node.js.yml/badge.svg)
 
 ### 🚧 Getting started
